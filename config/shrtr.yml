@@ -1,0 +1,3 @@
+# Configure Shrtr
+mappings: /Users/Ben/code/benward/repo.git/jekyll/_site/short.yaml
+failure_url: http://benward.me/
