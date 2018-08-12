@@ -1,12 +1,13 @@
 require 'rubygems'
 require 'rack'
 require 'yaml'
+require 'filewatcher'
 
 # Shrtr is a tiny class that handles redirection, via a mappings Yml file
 class Shrtr
 
   class MissingConfigException < Exception; end
-
+  class InvalidMappingsException < Exception; end
 
   def initialize(config = './config/shrtr.yml')
     unless File.exist? config
@@ -19,8 +20,28 @@ class Shrtr
       raise MissingConfigException, "No mappings configured"
     end
 
-    mapping_config = YAML.load_file(@config['mappings'])
-    @mappings = mapping_config["shorturls"]
+    Thread.new do
+      Filewatcher.new([@config['mappings']]).watch do |filename, event|
+        puts "SHRTR mappings file changed. Reload…"
+        reload_mappings(filename)
+      end
+    end
+
+    reload_mappings(@config['mappings'])
+    @loaded = true
+  end
+
+  def reload_mappings(from_file)
+    begin
+      mapping_config = YAML.load_file(from_file)
+      @mappings = mapping_config["shorturls"]
+    rescue
+      unless @loaded
+        raise InvalidMappingsException, "FATAL: Error parsing mappings YAML."
+      else
+        puts "Updated mappings are invalid YAML."
+      end
+    end
   end
 
   def fallback_url
