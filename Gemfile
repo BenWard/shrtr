@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
 
-gem 'eventmachine'
 gem 'rack'
-gem 'thin'
+gem 'thin', "~>1.7"
