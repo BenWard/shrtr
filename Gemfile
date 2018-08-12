@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-gem 'rack'
-gem 'thin', "~>1.7"
+gem 'thin', '~>1.7'
+gem 'filewatcher', '~> 1'
